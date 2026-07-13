@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Powerlifting Warm-Up">
+  <rect width="512" height="512" rx="96" fill="#0a0a0a" />
+  <!-- Barbell mark -->
+  <g fill="none" stroke="#e35313" stroke-width="26" stroke-linecap="round">
+    <line x1="140" y1="256" x2="372" y2="256" />
+  </g>
+  <g fill="#fafafa">
+    <rect x="96" y="196" width="34" height="120" rx="10" />
+    <rect x="382" y="196" width="34" height="120" rx="10" />
+  </g>
+  <g fill="#e35313">
+    <rect x="140" y="176" width="30" height="160" rx="10" />
+    <rect x="342" y="176" width="30" height="160" rx="10" />
+  </g>
+</svg>
