@@ -26,6 +26,8 @@ export interface Exercise {
   timer?: ExerciseTimer;
   /** Alternative movements, e.g. "Kettlebell swing — 3 × 5". */
   alternatives?: string[];
+  /** Optional reference image (external URL or data URI) shown in the warm-up. */
+  imageUrl?: string;
 }
 
 export interface PostLiftReset {

@@ -4,6 +4,7 @@ import type { Exercise, MeasureType } from '../../types';
 import { Modal } from '../../components/Modal';
 import { Toggle } from '../../components/Toggle';
 import { TextField, TextArea, SelectField, FieldRow } from '../../components/Inputs';
+import { sanitizeImageUrl } from '../../lib/validation/validation';
 
 interface ExerciseEditorProps {
   open: boolean;
@@ -34,10 +35,12 @@ const PRESCRIPTION_HINTS: Record<MeasureType, string> = {
 export function ExerciseEditor({ open, exercise, onSave, onClose }: ExerciseEditorProps) {
   const [draft, setDraft] = useState<Exercise | null>(exercise);
   const [error, setError] = useState<string | null>(null);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     setDraft(exercise ? JSON.parse(JSON.stringify(exercise)) : null);
     setError(null);
+    setImgError(false);
   }, [exercise, open]);
 
   if (!draft) return null;
@@ -86,6 +89,7 @@ export function ExerciseEditor({ open, exercise, onSave, onClose }: ExerciseEdit
       timer: timerEnabled
         ? { enabled: true, durationSeconds: Math.max(1, draft.timer?.durationSeconds ?? 30) }
         : undefined,
+      imageUrl: sanitizeImageUrl(draft.imageUrl),
     };
     onSave(cleaned);
   };
@@ -137,6 +141,41 @@ export function ExerciseEditor({ open, exercise, onSave, onClose }: ExerciseEdit
           placeholder="Short note shown under the exercise"
           rows={2}
         />
+
+        {/* Reference image */}
+        <div>
+          <TextField
+            label="Image URL (optional)"
+            value={draft.imageUrl ?? ''}
+            onChange={(v) => {
+              setImgError(false);
+              update({ imageUrl: v });
+            }}
+            type="url"
+            placeholder="https://…"
+            hint="Paste a link to a reference photo or GIF. Shown as a thumbnail in the warm-up."
+          />
+          {sanitizeImageUrl(draft.imageUrl) && !imgError && (
+            <div className="mt-2">
+              <img
+                src={sanitizeImageUrl(draft.imageUrl)}
+                alt={`Preview of ${draft.name || 'exercise'}`}
+                onError={() => setImgError(true)}
+                className="max-h-40 w-auto rounded-lg border border-zinc-200 object-contain dark:border-zinc-800"
+              />
+            </div>
+          )}
+          {draft.imageUrl && sanitizeImageUrl(draft.imageUrl) && imgError && (
+            <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
+              That image couldn't be loaded. Check the link is a direct image URL (ends in .jpg, .png, .gif, …).
+            </p>
+          )}
+          {draft.imageUrl?.trim() && !sanitizeImageUrl(draft.imageUrl) && (
+            <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
+              Only http(s) links or data URIs are allowed.
+            </p>
+          )}
+        </div>
 
         {/* Cues */}
         <fieldset className="space-y-2">

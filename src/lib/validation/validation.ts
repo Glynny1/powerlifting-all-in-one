@@ -45,6 +45,20 @@ function asStringArray(v: unknown): string[] | undefined {
   return arr.length ? arr : undefined;
 }
 
+/**
+ * Accept only safe image sources: http(s), data:image, or relative paths.
+ * (An <img> can't execute `javascript:` URLs, but we reject them for hygiene.)
+ */
+export function sanitizeImageUrl(v: unknown): string | undefined {
+  if (typeof v !== 'string') return undefined;
+  const url = v.trim();
+  if (!url) return undefined;
+  if (/^https?:\/\//i.test(url)) return url;
+  if (/^data:image\//i.test(url)) return url;
+  if (/^(\.?\/)/.test(url)) return url; // relative path within the app
+  return undefined;
+}
+
 export function normalizeExercise(input: unknown, idPrefix = 'ex'): Exercise {
   if (!isObject(input)) {
     throw new ValidationError('Exercise must be an object.');
@@ -78,6 +92,7 @@ export function normalizeExercise(input: unknown, idPrefix = 'ex'): Exercise {
     optional: input.optional === true ? true : undefined,
     timer,
     alternatives: asStringArray(input.alternatives),
+    imageUrl: sanitizeImageUrl(input.imageUrl),
   };
 }
 

@@ -1,8 +1,9 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { Timer as TimerIcon, Info } from 'lucide-react';
 import type { Exercise } from '../../types';
 import { Checkbox } from '../../components/Checkbox';
 import { ExerciseTimer } from '../timer/ExerciseTimer';
+import { Modal } from '../../components/Modal';
 import { cn } from '../../lib/cn';
 
 interface ExerciseRowProps {
@@ -27,9 +28,12 @@ export function ExerciseRow({
   onCloseTimer,
 }: ExerciseRowProps) {
   const checkboxId = useId();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const hasTimer = exercise.timer?.enabled && (exercise.timer.durationSeconds ?? 0) > 0;
   const hasCues = (exercise.cues?.length ?? 0) > 0;
   const hasAlternatives = (exercise.alternatives?.length ?? 0) > 0;
+  const hasImage = Boolean(exercise.imageUrl) && !imgError;
 
   return (
     <li className="density-py border-t border-zinc-100 dark:border-zinc-800 first:border-t-0">
@@ -79,6 +83,23 @@ export function ExerciseRow({
             </details>
           )}
 
+          {exercise.imageUrl && !imgError && (
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(true)}
+              className="mt-2 block overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800"
+              aria-label={`View reference image for ${exercise.name}`}
+            >
+              <img
+                src={exercise.imageUrl}
+                alt={`Reference for ${exercise.name}`}
+                loading="lazy"
+                onError={() => setImgError(true)}
+                className="h-16 w-16 object-cover"
+              />
+            </button>
+          )}
+
           {timerActive && hasTimer && (
             <ExerciseTimer
               exerciseName={exercise.name}
@@ -101,6 +122,17 @@ export function ExerciseRow({
           </button>
         )}
       </div>
+
+      {hasImage && (
+        <Modal open={lightboxOpen} onClose={() => setLightboxOpen(false)} title={exercise.name}>
+          <img
+            src={exercise.imageUrl}
+            alt={`Reference for ${exercise.name}`}
+            onError={() => setImgError(true)}
+            className="mx-auto max-h-[70vh] w-auto rounded-lg object-contain"
+          />
+        </Modal>
+      )}
     </li>
   );
 }

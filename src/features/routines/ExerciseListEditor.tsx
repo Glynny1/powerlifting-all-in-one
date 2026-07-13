@@ -56,6 +56,7 @@ export function ExerciseListEditor({ routineId, location, exercises }: ExerciseL
                 {ex.optional && <span>optional</span>}
                 {ex.timer?.enabled && <span>timer {ex.timer.durationSeconds ?? 0}s</span>}
                 {ex.cues?.length ? <span>{ex.cues.length} cues</span> : null}
+                {ex.imageUrl && <span>image</span>}
               </span>
             </button>
 
